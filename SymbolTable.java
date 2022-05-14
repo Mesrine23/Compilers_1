@@ -31,8 +31,10 @@ class SymbolTable {
             String motherClass = info.getLast();
             if(!(check.equals("int") || check.equals("boolean") || check.equals("int[]") || check.equals("boolean[]"))){
                 if(classOrder.containsKey(check)) {
-                    if (motherClass.equals(classOrder.get(check)))
+                    if (motherClass.equals(classOrder.get(check))) {
+                        System.out.println("In symbol table {checkCorrectness} -> motherClass.equals(classOrder.get(check)");
                         return false;
+                    }
                 }
                 else
                     return false;
@@ -97,7 +99,6 @@ class SymbolTable {
         LinkedList<String> key1 = new LinkedList<>();
         LinkedList<String> key2 = new LinkedList<>();
         LinkedList<String> key3 = new LinkedList<>();
-        LinkedList<String> key4 = new LinkedList<>();
         String type=null;
         if (curr_class.equals(this.MainName)) {
             key.add(id);
@@ -134,13 +135,19 @@ class SymbolTable {
                 return type;
 
             if(type==null && mother_class!=null){
-                key4.add(id);
-                key4.add(mother_class);
-                type = this.varDecl.get(key4);
+                String[] mums = mother_class.split("\\-");
+                for (int i=0 ; i < mums.length ; ++i) {
+                    LinkedList<String> key4 = new LinkedList<>();
+                    key4.add(id);
+                    key4.add(mums[i]);
+                    type = this.varDecl.get(key4);
+                    if(type!=null)
+                        return type;
+                }
             }
             //System.out.println("SHOULDA FIND ALREADY SOMETHING");
             if(type == null)
-                throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+                throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn retType of SymbolTable: didn't find the type needed.");
         }
         return type;
     }

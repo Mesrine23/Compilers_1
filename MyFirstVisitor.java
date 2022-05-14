@@ -83,9 +83,9 @@ class MyFirstVisitor extends GJDepthFirst<String, String> {
             throw new Exception("\n\n~~~~~Typecheck error~~~~~\nIn class extends declaration -> class extends itself");
         if(symbolTable.classOrder.containsKey(classname) || !symbolTable.classOrder.containsKey(extention))
             throw new Exception("\n\n~~~~~Typecheck error~~~~~\nIn class extends declaration -> redefiniton of class OR mother class not defined exists");
-        //if(symbolTable.classOrder.containsKey(extention))
-        if(symbolTable.classOrder.get(extention) != null)
-            throw new Exception("\n\n~~~~~Typecheck error~~~~~\nIn class extends declaration -> mother class is already a child class");
+        String inheritance = symbolTable.classOrder.get(extention);
+        if(inheritance != null)
+            extention += "-" + inheritance;
         symbolTable.classOrder.put(classname,extention);
         //list.add(classname);
         n.f5.accept(this, classname);

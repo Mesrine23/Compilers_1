@@ -26,7 +26,7 @@ public class Main {
             MyFirstVisitor eval = new MyFirstVisitor();
             root.accept(eval, null);
 
-            MySecondVisitor eval2 = new MySecondVisitor(eval.symbolTable);
+            TestVisitor eval2 = new TestVisitor(eval.symbolTable);
             root.accept(eval2,null);
         }
         catch(ParseException ex){

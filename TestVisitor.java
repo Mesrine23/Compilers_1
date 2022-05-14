@@ -77,7 +77,8 @@ class TestVisitor extends GJDepthFirst<String, String> {
     @Override
     public String visit(ClassExtendsDeclaration n, String argu) throws Exception {
         this.curr_class = n.f1.accept(this,"~give_string");
-        this.mother_class = n.f3.accept(this,"~give_string");
+        this.mother_class = symbolTable.classOrder.get(curr_class);
+        //this.mother_class = n.f3.accept(this,"~give_string");
         n.f6.accept(this,null);
         return null;
     }
@@ -170,14 +171,20 @@ class TestVisitor extends GJDepthFirst<String, String> {
             expr = n.f2.accept(this, "~give_id_class");
             if(expr=="this")
                 expr = this.curr_class;
+            int flag=0;
             if (!type.equals(expr)) {
                 String mum = symbolTable.classOrder.get(expr);
-                //System.out.println("mum: " + mum);
-                if (!type.equals(mum))
+                String[] mums = mum.split("\\-");
+                for(int i=0 ; i < mums.length ; i++) {
+                    if (type.equals(mums[i])) {
+                        flag = 1;
+                        break;
+                    }
+                }
+                if (flag==0)
                     throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn assignment statement -> shoulda return class type\n");
             }
         }
-
         return null;
     }
 
@@ -516,11 +523,21 @@ class TestVisitor extends GJDepthFirst<String, String> {
             methInfo = symbolTable.methodDecl.get(key);
         }
         else if (symbolTable.classOrder.get(classCheck)!=null) {
+            int flag=0;
             String mum = symbolTable.classOrder.get(classCheck);
-            LinkedList<String> key2 = new LinkedList<>();
-            key2.add(id);
-            key2.add(mum);
-            methInfo = symbolTable.methodDecl.get(key2);
+            String[] mums = mum.split("\\-");
+            for(int i=0 ; i < mums.length ; ++i) {
+                LinkedList<String> key2 = new LinkedList<>();
+                key2.add(id);
+                key2.add(mums[i]);
+                if(symbolTable.methodDecl.containsKey(key2)){
+                    methInfo = symbolTable.methodDecl.get(key2);
+                    flag=1;
+                    break;
+                }
+            }
+            if(flag==0)
+                throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn message send -> key doesnt exist in any mother's method declaration list\n");
         }
         else
             throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn message send -> key doesnt exist in method declaration list\n");
@@ -554,10 +571,20 @@ class TestVisitor extends GJDepthFirst<String, String> {
             else
                 check = list2.get(i);
             if (!list1.get(i).equals(check)) {
-                String s1 = symbolTable.classOrder.get(check);
-                if((s1==null) || (!symbolTable.classOrder.get(check).equals(list1.get(i)))) {
-                    throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn message send -> content missmatch between argument and call list\n");
+                String mum = symbolTable.classOrder.get(check);
+                if(mum==null)
+                    throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn message send -> content missmatch between argument and call list (1)\n");
+                // || (!symbolTable.classOrder.get(check).equals(list1.get(i))))
+                String[] mums = mum.split("\\-");
+                int flag=0;
+                for(int j=0 ; j < mums.length ; ++j){
+                    if(mums[j].equals(list1.get(i))) {
+                        flag = 1;
+                        break;
+                    }
                 }
+                if(flag==0)
+                    throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn message send -> content missmatch between argument and call list (2)\n");
             }
         }
         //System.out.println("type in msg send: " + methInfo.Type);
