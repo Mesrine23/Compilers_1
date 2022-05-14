@@ -37,7 +37,7 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
     @Override
     public String visit(MainClass n, String argu) throws Exception {
         if(!symbolTable.checkCorrectness())
-            throw new Exception("\n\n~~~~~Typecheck error~~~~~\n");
+            throw new Exception("\n\n~~~~~Typecheck error~~~~~\nIn second visitor -> check correctness of symbol table\n");
         symbolTable.printST();
         symbolTable.Offsets();
         this.curr_class = n.f1.accept(this,"~give_string");
@@ -105,27 +105,27 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
         if (type.equals("int")) {
             expr = n.f10.accept(this, "~give_int");
             if (!type.equals(expr))
-                throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+                throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn method declaration -> shoulda return int\n");
         }
         else if (type.equals("boolean")) {
             expr = n.f10.accept(this, "~give_bool");
             if (!type.equals(expr))
-                throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+                throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn method declaration -> shoulda return boolean\n");
         }
         else if (type.equals("boolean[]")){
             expr = n.f10.accept(this, "~~give_array_type");
             if (!expr.equals("array~boolean"))
-                throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+                throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn method declaration -> shoulda return boolean[]\n");
         }
         else if (type.equals("int[]")) {
             expr = n.f10.accept(this, "~~give_array_type");
             if (!expr.equals("array~int"))
-                throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+                throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn method declaration -> shoulda return int[]\n");
         }
         else {
             expr = n.f10.accept(this, "~give_id_class");
             if (!type.equals(expr)) {
-                throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+                throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn method declaration -> shoulda return class type\n");
             }
         }
 
@@ -159,23 +159,24 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
         if (type.equals("int")) {
             expr = n.f2.accept(this, "~give_int");
             if (!type.equals(expr))
-                throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+                throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn assignment statement -> shoulda return int\n");
         }
         else if (type.equals("boolean")) {
             expr = n.f2.accept(this, "~give_bool");
             if (!type.equals(expr))
-                throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+                throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn assignment statement -> shoulda return boolean\n");
         }
         else {
             expr = n.f2.accept(this, "~give_id_class");
+            if(expr=="this")
+                expr = this.curr_class;
             if (!type.equals(expr)) {
                 String mum = symbolTable.classOrder.get(expr);
+                //System.out.println("mum: " + mum);
                 if (!type.equals(mum))
-                    throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+                    throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn assignment statement -> shoulda return class type\n");
             }
         }
-
-
 
         return null;
     }
@@ -196,7 +197,7 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
         String index = n.f2.accept(this,"~give_int");
 
         if(!index.equals("int"))
-            throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+            throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn array assignment statement -> shoulda return int\n");
 
         String expr;
         if(type.equals("int"))
@@ -207,7 +208,7 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
             expr = n.f2.accept(this,"~give_id_class");
 
         if(!type.equals(expr + "[]"))
-            throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+            throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn array assignment statement -> missmatch array type\n");
 
         return null;
     }
@@ -251,7 +252,9 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
      * f4 -> ";"
      */
     public String visit(PrintStatement n, String argu) throws Exception {
-        n.f2.accept(this,"~give_id_class");
+        String type = n.f2.accept(this,"~give_id_class");
+        if (!type.equals("int") && !type.equals("boolean"))
+            throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn print statement -> type must be either 'int' or 'boolean'\n");
         return null;
     }
 
@@ -279,7 +282,7 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
     public String visit(NotExpression n, String argu) throws Exception {
         String clause = n.f1.accept(this,argu);
         if (!clause.equals("boolean"))
-            throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+            throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn not expression -> shoulda return boolean\n");
         return clause;
     }
 
@@ -296,7 +299,7 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
         if(expr1.equals("int") && expr2.equals("int"))
             return "int";
         else
-            throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+            throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn plus expression -> expressions must be int\n");
     }
 
     /**
@@ -312,7 +315,7 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
         if(expr1.equals("int") && expr2.equals("int"))
             return "int";
         else
-            throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+            throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn minus expression -> expressions must be int\n");
     }
 
     /**
@@ -328,7 +331,7 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
         if(expr1.equals("int") && expr2.equals("int"))
             return "int";
         else
-            throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+            throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn times expression -> expressions must be int\n");
     }
 
     /**
@@ -344,7 +347,7 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
         if(expr1.equals("int") && expr2.equals("int"))
             return "boolean";
         else
-            throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+            throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn compare expression -> expressions must be int\n");
     }
 
     /**
@@ -357,7 +360,7 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
         String clause1 = n.f0.accept(this,"~give_bool");
         String clause2 = n.f2.accept(this,"~give_bool");
         if(!clause1.equals("boolean") || !clause2.equals("boolean"))
-            throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+            throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn and expression -> clause must be boolean\n");
         return "boolean";
     }
 
@@ -380,13 +383,23 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
     public String visit(ArrayLookup n, String argu) throws Exception {
         String id = n.f0.accept(this,"~give_array_type");
         String expr = n.f2.accept(this,"~give_int");
-        if (expr.equals("int") && (id.equals("array~int") || id.equals("array~boolean")))
+        if (expr.equals("int"))
         {
-            String[] splt = id.split("~");
-            return splt[1];
+            if (id.equals("array~int") || id.equals("array~boolean")) {
+                String[] splt = id.split("~");
+                return splt[1];
+            }
+            else if (id.equals("boolean[]"))
+                return "boolean";
+            else if (id.equals("int[]"))
+                return "int";
+            else
+                throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn array lookup -> wrong array type\n");
         }
-        else
-            throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+        else {
+            //System.out.println("\n" + id + "\n");
+            throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn array lookup -> check expression type and identifier type\n");
+        }
     }
 
     /**
@@ -398,7 +411,7 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
     public String visit(ArrayLength n, String argu) throws Exception {
         String expr = n.f0.accept(this,"~give_array_type");
         if(!expr.equals("array~int") && !expr.equals("array~boolean"))
-            throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+            throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn array length -> expression must be array\n");
         return "int";
     }
 
@@ -422,7 +435,7 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
     public String visit(BooleanArrayAllocationExpression n, String argu) throws Exception {
         String expr = n.f3.accept(this,"~give_int");
         if(!expr.equals("int"))
-            throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+            throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn boolean array allocation expression -> expression must be int\n");
         return "boolean[]";
     }
 
@@ -437,7 +450,7 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
     public String visit(IntegerArrayAllocationExpression n, String argu) throws Exception {
         String expr = n.f3.accept(this,"~give_int");
         if(!expr.equals("int"))
-            throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+            throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn integer array allocation expression -> expression must be int\n");
         return "int[]";
     }
 
@@ -451,7 +464,7 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
     public String visit(AllocationExpression n, String argu) throws Exception {
         String cl = n.f1.accept(this,"~give_string");
         if(cl.equals(this.symbolTable.MainName) || !symbolTable.classOrder.containsKey(cl))
-            throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+            throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn allocation expression -> problem with type\n");
         return cl;
     }
 
@@ -482,15 +495,22 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
             classCheck = this.curr_class;
         else if (symbolTable.classOrder.containsKey(prime_expr))
             classCheck = prime_expr;
-        else
-            throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+        else {
+//            System.out.println("\n");
+//            System.out.println("curr class : " + this.curr_class);
+//            System.out.println("curr method : " + this.curr_method);
+//            System.out.println(prime_expr);
+            classCheck = symbolTable.retType(prime_expr,this.curr_class,this.mother_class,this.curr_method);
+            if(classCheck==null)
+                throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn message send -> classCheck error\n");
+        }
 
         String id = n.f2.accept(this,"~give_string");
 
         LinkedList<String> key = new LinkedList<>();
         key.add(id);
         key.add(classCheck);
-        System.out.println(key);
+        //System.out.println(key);
         MethodSymTable methInfo = new MethodSymTable();
         if(symbolTable.methodDecl.containsKey(key)) {
             methInfo = symbolTable.methodDecl.get(key);
@@ -503,7 +523,7 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
             methInfo = symbolTable.methodDecl.get(key2);
         }
         else
-            throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+            throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn message send -> key doesnt exist in method declaration list\n");
 
         LinkedList<String> list1 = new LinkedList<>();
         for (Map.Entry<LinkedList<String>, String> check1 : methInfo.argList.entrySet())
@@ -523,19 +543,24 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
                 list2.add(argL.get(i));
         }
 
-        System.out.println(list1.size());
-        System.out.println(list2.size());
-
         if(list2.size()!=list1.size()) {
-            throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+            throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn message send -> size missmatch between argument and call list\n");
         }
 
         for (int i=0 ; i<list1.size() ; ++i) {
-            if (!list1.get(i).equals(list2.get(i))) {
-                throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+            String check;
+            if(list2.get(i).equals("this"))
+                check = this.curr_class;
+            else
+                check = list2.get(i);
+            if (!list1.get(i).equals(check)) {
+                String s1 = symbolTable.classOrder.get(check);
+                if((s1==null) || (!symbolTable.classOrder.get(check).equals(list1.get(i)))) {
+                    throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn message send -> content missmatch between argument and call list\n");
+                }
             }
         }
-
+        //System.out.println("type in msg send: " + methInfo.Type);
         return methInfo.Type;
     }
 
@@ -578,13 +603,13 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
         if(argu.equals("~give_int")){
             String type = symbolTable.retType(n.f0.toString(),curr_class,mother_class,curr_method);
             if(!type.equals("int"))
-                throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+                throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn identifier -> should be int\n");
             return "int";
         }
         else if(argu.equals("~give_bool")) {
             String type = symbolTable.retType(n.f0.toString(),curr_class,mother_class,curr_method);
             if(!type.equals("boolean"))
-                throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+                throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn identifier -> should be boolean\n");
             return "boolean";
         }
         else if (argu.equals("~give_array_type")){
@@ -598,13 +623,13 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
                 return "array~boolean";
             }
             else
-                throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+                throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn identifier -> should be array type\n");
         }
         else if (argu.equals("~give_class_type")) {
             if(symbolTable.classOrder.containsKey(n.f0.toString()))
                 return n.f0.toString();
             else
-                throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+                throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn identifier -> identifier doesnt exists\n");
         }
         else if (argu.equals("~give_string")) {
             return n.f0.toString();
@@ -613,7 +638,7 @@ class MySecondVisitor extends GJDepthFirst<String, String> {
             return symbolTable.retType(n.f0.toString(),curr_class,mother_class,curr_method);
         }
         else
-            throw new Exception("\n\n~~~~~Semantic error~~~~~\n");
+            throw new Exception("\n\n~~~~~Semantic error~~~~~\nIn identifier -> no command given from argu\n");
     }
 
     @Override
