@@ -20,3 +20,7 @@ class C extends B {
 class D extends C {
     int x4;
 }
+
+class E {
+    boolean test;
+}

@@ -158,28 +158,33 @@ class SymbolTable {
             String curr_class = class_ord.getKey();
             if(curr_class.equals(MainName))
                 continue;
-            String child_class=null;
-           if(mum_class!=null)
+            if(mum_class!=null)
                 continue;
+            System.out.println("ABOUT SUPER CLASS: " + curr_class);
+            String child_class=null;
+            String youngest=null;
             for(Map.Entry<String,String> class_ord1 : classOrder.entrySet()) {
                 String s1 = class_ord1.getValue();
                 if(s1==null)
                     continue;
-//                System.out.println("curr_class: " + curr_class);
-//                System.out.println("s1: " + s1);
-                if(s1.equals(curr_class)){
-                    child_class = class_ord1.getKey();
-                    break;
+                String[] mums = s1.split("\\-");
+                if(mums[mums.length-1].equals(curr_class)){
+                    child_class = s1;
+                    youngest = class_ord1.getKey();
                 }
             }
-            //System.out.println("curr_class: " + curr_class);
+            System.out.println("curr_class: " + curr_class);
+            System.out.println("all childs: " + child_class);
             int offset = this.printOffsets(0,curr_class,false);
 
             if(child_class==null)
                 continue;
 
-            //System.out.println("child_class: " + child_class);
-            this.printOffsets(offset,child_class,true);
+            String[] mums = child_class.split("\\-");
+            for(int i = mums.length-2 ; i>=0 ; i--)
+                offset = this.printOffsets(offset,mums[i],true);
+            if(youngest!=null)
+                this.printOffsets(offset,youngest,true);
         }
     }
 
